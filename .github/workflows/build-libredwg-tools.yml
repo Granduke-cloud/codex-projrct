@@ -1,0 +1,31 @@
+name: Build LibreDWG Tools
+on:
+  push:
+    branches: [cad-tools-temp]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential autoconf automake libtool pkg-config git
+      - name: Build LibreDWG
+        run: |
+          git clone --depth 1 https://github.com/LibreDWG/libredwg.git /tmp/libredwg
+          cd /tmp/libredwg
+          autoreconf -fvi
+          ./configure --disable-shared
+          make -j2
+          mkdir -p "$GITHUB_WORKSPACE/cad-tools"
+          find . -type f \( -name dwg2dxf -o -name dxf2dwg -o -name dwgread \) -perm -111 -exec cp -v {} "$GITHUB_WORKSPACE/cad-tools/" \;
+          ls -lah "$GITHUB_WORKSPACE/cad-tools"
+      - name: Upload CAD tools
+        uses: actions/upload-artifact@v4
+        with:
+          name: libredwg-linux-tools
+          path: cad-tools/
+          retention-days: 1
