@@ -1,0 +1,25 @@
+name: Download ODA File Converter
+on:
+  push:
+    branches: [cad-tools-temp]
+  workflow_dispatch:
+
+jobs:
+  download:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download ODA File Converter AppImage
+        run: |
+          set -euxo pipefail
+          mkdir -p oda
+          curl -L --fail --retry 3 -A 'Mozilla/5.0' 'https://www.opendesign.com/guestfiles/get?filename=ODAFileConverter_QT6_lnxX64_11dll.AppImage' -o oda/ODAFileConverter.AppImage
+          chmod +x oda/ODAFileConverter.AppImage
+          ls -lh oda/ODAFileConverter.AppImage
+          file oda/ODAFileConverter.AppImage
+      - name: Upload ODA converter
+        uses: actions/upload-artifact@v4
+        with:
+          name: oda-file-converter-appimage
+          path: oda/ODAFileConverter.AppImage
+          retention-days: 1
