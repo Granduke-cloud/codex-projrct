@@ -15,10 +15,10 @@ jobs:
           sudo apt-get install -y build-essential autoconf automake libtool pkg-config git
       - name: Build LibreDWG
         run: |
-          git clone --depth 1 https://github.com/LibreDWG/libredwg.git /tmp/libredwg
+          git clone --depth 1 --recurse-submodules https://github.com/LibreDWG/libredwg.git /tmp/libredwg
           cd /tmp/libredwg
           autoreconf -fvi
-          ./configure --disable-shared
+          ./configure --disable-shared --disable-bindings --disable-docs
           make -j2
           mkdir -p "$GITHUB_WORKSPACE/cad-tools"
           find . -type f \( -name dwg2dxf -o -name dxf2dwg -o -name dwgread \) -perm -111 -exec cp -v {} "$GITHUB_WORKSPACE/cad-tools/" \;
